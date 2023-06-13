@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% comment %} {% load crispy_forms_tags %} {% endcomment %}
+{% load static %}
+{% block content %}
+    {% comment %} Book Info Section {% endcomment %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card mb-3">
+                    {% if book.thumbnail_url != "images/default_book_cover.jpg" %}
+                        <img class="card-img-top rounded"
+                             src="{{ book.thumbnail_url }}"
+                             alt="Cover Image"
+                             height=""
+                             width="">
+                    {% else %}
+                        <img class="card-img-top rounded" src="{% static "images/default_book_cover.jpg" %}" alt="Cover Image" height="" width="">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div>
+                    <h2>{{ book.title }}</h2>
+                    <h4>Authored by</h4>
+                    <p>
+                        {% for author in book.authors %}
+                            {% if forloop.last %}
+                                <span class="fw-bold">{{ author }}</span>
+                            {% else %}
+                                <span class="fw-bold">{{ author }},</span>
+                            {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p>{{ book.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Add Review Section {% endcomment %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-6">
+                <form method="post" action="{% url 'books:detail' %}?isbn={{ book.isbn }}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="stars_given" class="form-label">
+                            <span class="fw-bold">Rating</span>
+                        </label>
+                        <div id="rating-stars" class="btn-group" role="group" aria-label="Rating">
+                            <button type="button" class="btn btn-secondary" data-rating="1">1</button>
+                            <button type="button" class="btn btn-secondary" data-rating="2">2</button>
+                            <button type="button" class="btn btn-secondary" data-rating="3">3</button>
+                            <button type="button" class="btn btn-secondary" data-rating="4">4</button>
+                            <button type="button" class="btn btn-secondary" data-rating="5">5</button>
+                        </div>
+                        <input type="hidden" name="stars_given" id="stars_given">
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">
+                            <span class="fw-bold">Comment</span>
+                        </label>
+                        <div class="d-flex align-items-start">
+                            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary">Add Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function() {
+            $("#rating-stars button").on("click", function() {
+                var rating = $(this).data("rating");
+                $("#rating-stars button").removeClass("active");
+                $(this).addClass("active");
+                $("#stars_given").val(rating);
+            });
+        });
+    </script>
+    {% comment %} Reviews Comment Section {% endcomment %}
+    <div class="container mt-4">
+        <h4>Reviews</h4>
+        {% if reviews is None %}
+            <p>No reviews yet. Add your own!</p>
+        {% else %}
+            {% for review in reviews %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-1">
+                                {% if review.user.profile_picture != "images/default_profile_pic.jpg" %}
+                                    <img src="{{ review.user.profile_picture }}"
+                                         alt="User Profile"
+                                         class="rounded-circle"
+                                         height="50"
+                                         width="50">
+                                {% else %}
+                                    <img src="{% static "users/images/default_profile_pic.jpg" %}" alt="User Profile" class="rounded-circle" height="50" width="50">
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-11">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <span class="fw-bold">{{ review.user.username }}</span> rated it <span class="fw-bold">{{ review.stars_given }}</span> stars on
+                                        <span><em>{{ review.created_at }}</em></span>
+                                    </div>
+                                    {% if review.user == request.user %}
+                                        <div>
+                                            <a href="{% url "books:edit-review" review.id %}">
+                                                <span>Edit</span>
+                                            </a>
+                                            <br>
+                                            <a href="{% url "books:confirm-delete-review" review.id %}">
+                                                <span>Delete</span>
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <p>{{ review.comment }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock content %}

@@ -1,0 +1,7 @@
+__pycache__/
+*.sh
+*.json
+db.sqlite3
+TODO
+static/
+**/migrations/

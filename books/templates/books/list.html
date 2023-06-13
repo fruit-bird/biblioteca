@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    <h1 class="text-center">Books</h1>
+{% endblock title %}
+{% block content %}
+    {% comment %} Search Bar {% endcomment %}
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+            <form class="d-flex">
+                <input type="text"
+                       placeholder="Search"
+                       name="q"
+                       value="{{ search_query }}"
+                       class="form-control me-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+    {% comment %} Search Results + Pager {% endcomment %}
+    {% if page_obj %}
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for book in page_obj.object_list %}
+                    <div class="col">
+                        <div class="card h-100">
+                            {% if book.thumbnail_url %}
+                                <img class="card-img-top rounded"
+                                     height=""
+                                     width=""
+                                     src="{{ book.thumbnail_url }}"
+                                     alt="Cover Image">
+                            {% else %}
+                                <img class="card-img-top rounded" height="" width="" src="{% static "books/images/default_book_cover2.jpg" %}" alt="Cover Image">
+                            {% endif %}
+                            <div class="card-body">
+                                <a href="{% url "books:detail" %}?isbn={{ book.isbn }}">
+                                    <h5 class="card-title">{{ book.title }}</h5>
+                                </a>
+                                <p class="card-text text-muted">
+                                    {% for author in book.authors %}
+                                        {% if forloop.last %}
+                                            {{ author }}
+                                        {% else %}
+                                            {{ author }},
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% comment %} Pager {% endcomment %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ search_query }}&page=1">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?q={{ search_query }}&page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+                {% for i in page_obj.paginator.page_range %}
+                    {% if page_obj.number == i %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?q={{ search_query }}&page={{ i }}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?q={{ search_query }}&page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="?q={{ search_query }}&page={{ page_obj.paginator.num_pages }}">Last</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% else %}
+        <div class="row">
+            <div class="col">
+                <p class="text-center text-danger fw-bold">No match found.</p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock content %}

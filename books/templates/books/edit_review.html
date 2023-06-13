@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %} {% load crispy_forms_tags %} {% endcomment %}
+{% block title %}
+    <h1 class="text-center">Edit Review</h1>
+{% endblock title %}
+{% block content %}
+    {% comment %} Old Review Section {% endcomment %}
+    <div class="container mt-4">
+        <h3>Old Review</h3>
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-1">
+                        {% if review.user.profile_picture != "images/default_profile_pic.jpg" %}
+                            <img src="{{ review.user.profile_picture }}"
+                                 alt="User Profile"
+                                 class="rounded-circle"
+                                 height="50"
+                                 width="50">
+                        {% else %}
+                            <img src="{% static "users/images/default_profile_pic.jpg" %}" alt="User Profile" class="rounded-circle" height="50" width="50">
+                        {% endif %}
+                    </div>
+                    <div class="col-lg-11">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="fw-bold">{{ review.user.username }}</span> rated it <span class="fw-bold">{{ review.stars_given }}</span> stars on
+                                <span><em>{{ review.created_at }}</em></span>
+                            </div>
+                        </div>
+                        <p>{{ review.comment }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} Edit Review Section {% endcomment %}
+    <div class="container mt-4">
+        <h3>New Review</h3>
+        <div class="row">
+            <div class="col-lg-6">
+                <form method="post" action="{% url 'books:detail' %}?isbn={{ book.isbn }}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="stars_given" class="form-label">
+                            <span class="fw-bold">Rating</span>
+                        </label>
+                        <div id="rating-stars" class="btn-group" role="group" aria-label="Rating">
+                            <button type="button" class="btn btn-secondary" data-rating="1">1</button>
+                            <button type="button" class="btn btn-secondary" data-rating="2">2</button>
+                            <button type="button" class="btn btn-secondary" data-rating="3">3</button>
+                            <button type="button" class="btn btn-secondary" data-rating="4">4</button>
+                            <button type="button" class="btn btn-secondary" data-rating="5">5</button>
+                        </div>
+                        <input type="hidden" name="stars_given" id="stars_given">
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">
+                            <span class="fw-bold">Comment</span>
+                        </label>
+                        <div class="d-flex align-items-start">
+                            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary">Add Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function() {
+            $("#rating-stars button").on("click", function() {
+                var rating = $(this).data("rating");
+                $("#rating-stars button").removeClass("active");
+                $(this).addClass("active");
+                $("#stars_given").val(rating);
+            });
+        });
+    </script>
+{% endblock content %}
