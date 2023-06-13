@@ -3,5 +3,5 @@ __pycache__/
 *.json
 db.sqlite3
 TODO
-static/
+/static/
 **/migrations/

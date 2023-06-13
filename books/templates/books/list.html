@@ -31,7 +31,7 @@
                                      src="{{ book.thumbnail_url }}"
                                      alt="Cover Image">
                             {% else %}
-                                <img class="card-img-top rounded" height="" width="" src="{% static "books/images/default_book_cover2.jpg" %}" alt="Cover Image">
+                                <img class="card-img-top rounded" height="" width="" src="{% static "books/images/default_book_cover.jpg" %}" alt="Cover Image">
                             {% endif %}
                             <div class="card-body">
                                 <a href="{% url "books:detail" %}?isbn={{ book.isbn }}">
